@@ -18,7 +18,7 @@ Deploys AWS EC2 instances from images listed in datasources.tf, runs an AWS User
 Generates an AWS ACM certificate and Route 53 domain verification and website DNS records.
 
 ## AWS User Data Bash Scripts Overview
-The AWS User Data Bash script installs nginx, creates a server block for the address listed in the `domain_name` variable in `nginx.tfvars`, and configures the security-related software packages described below. Please note the applicable distribution-specific notes.
+The AWS User Data Bash script installs nginx and Certbot, creates a server block for the address listed in the `domain_name` variable in `nginx.tfvars`, and configures the security-related software packages described below. Please note the applicable distribution-specific notes.
 
 |Security Measure|Ubuntu 22|Amazon Linux 2023|
 |--------|---------|------|
