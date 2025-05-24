@@ -1,5 +1,5 @@
 ########################################
-# EC2 Module Variables
+# nginx Module Variables
 ########################################
 variable "project" {
   type = string

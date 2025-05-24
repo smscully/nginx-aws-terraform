@@ -88,18 +88,18 @@ semanage port -a -t ssh_port_t -p tcp ${ssh_port}
 
 # Set hostname and local DNS
 hostnamectl set-hostname nginx
-echo "127.0.0.10 ec2" >> /etc/hosts
+echo "127.0.0.10 nginx" >> /etc/hosts
 
 # Install nginx
 yum install nginx -y
 systemctl is-enabled --quiet nginx || systemctl enable nginx
 systemctl is-active --quiet nginx || systemctl start nginx
 
-# Configure nginx server block
 # Create directory for web pages
 mkdir -p /var/www/${domain_name}/html
 chown -R $USER:$USER /var/www/${domain_name}/html
 chmod -R 755 /var/www/${domain_name}
+
 # Create index and error pages for server block
 cat > /var/www/${domain_name}/html/index.html << EOF
 <html>
@@ -121,6 +121,8 @@ cat > /var/www/${domain_name}/html/error.html << EOF
     </body>
 </html>
 EOF
+
+# Configure nginx server block
 # Create nginx configuration file
 cat > /etc/nginx/conf.d/${domain_name}.conf << EOF
 server {
@@ -142,18 +144,16 @@ systemctl reload nginx
 chcon -vR system_u:object_r:httpd_sys_content_t:s0 /var/www/${domain_name}
 
 # Install and configure Certbot for SSL/TLS certificate
-yum install python3 augeas-libs -y
-python3 -m venv /opt/certbot/
-/opt/certbot/bin/pip install --upgrade pip
-yes | /opt/certbot/bin/pip install certbot certbot-nginx
-/opt/certbot/bin/certbot --nginx --non-interactive -d ${domain_name} --email ${certbot_email} --agree-tos
+yum install certbot -y
+yum install python3-certbot-nginx -y
+certbot --nginx --non-interactive -d ${domain_name} --email ${certbot_email} --agree-tos
 # Create systemd service and timer to auto-renew Certbot
 cat >/lib/systemd/system/certbot-custom.service << EOF 
 [Unit]
 Description="Certbot - custom"
 [Service]
 Type=oneshot
-ExecStart=/opt/certbot/bin/certbot -q renew
+ExecStart=/usr/bin/certbot -q renew
 PrivateTmp=true
 EOF
 systemctl enable certbot-custom.service

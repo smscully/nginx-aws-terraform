@@ -47,18 +47,18 @@ systemctl is-active --quiet apparmor || systemctl start apparmor
 
 # Set hostname and local DNS
 hostnamectl set-hostname nginx
-echo "127.0.0.10 ec2" >> /etc/hosts
+echo "127.0.0.10 nginx" >> /etc/hosts
 
 # Install nginx
 apt install nginx -y
 systemctl is-enabled --quiet nginx || systemctl enable nginx
 systemctl is-active --quiet nginx || systemctl start nginx
 
-# Configure nginx server block
 # Create directory for web pages
 mkdir -p /var/www/${domain_name}/html
 chown -R $USER:$USER /var/www/${domain_name}/html
 chmod -R 755 /var/www/${domain_name}
+
 # Create index and error pages for server block
 cat > /var/www/${domain_name}/html/index.html << EOF
 <html>
@@ -80,6 +80,8 @@ cat > /var/www/${domain_name}/html/error.html << EOF
     </body>
 </html>
 EOF
+
+# Configure nginx server block
 # Create nginx configuration file
 cat > /etc/nginx/sites-available/${domain_name} << EOF
 server {
